@@ -1,0 +1,6 @@
+saveExact: true
+# 7 days, in minutes (SPEC §5.1)
+minimumReleaseAge: 10080
+# esbuild's postinstall only optimizes its launcher; not needed
+allowBuilds:
+  esbuild: false
