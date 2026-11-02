@@ -2,3 +2,104 @@
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 @import "fumadocs-openapi/css/preset.css";
+
+/* §12.3 mapped onto Fumadocs (§14.1). Read mode: the workbench's grey and ink, square corners, no picking animation. */
+:root {
+  --color-fd-background: #e6e7e3;
+  --color-fd-foreground: #161a1d;
+  --color-fd-card: #f5f5f1;
+  --color-fd-card-foreground: #161a1d;
+  --color-fd-popover: #f5f5f1;
+  --color-fd-popover-foreground: #161a1d;
+  --color-fd-muted: #d8dad5;
+  --color-fd-muted-foreground: #50575c;
+  --color-fd-secondary: #d8dad5;
+  --color-fd-secondary-foreground: #161a1d;
+  --color-fd-accent: #d8dad5;
+  --color-fd-accent-foreground: #161a1d;
+  --color-fd-border: #d8dad5;
+  --color-fd-ring: #161a1d;
+  --color-fd-primary: #b92c1a;
+  --color-fd-primary-foreground: #ffffff;
+  --radius-xl: 0;
+  --radius-lg: 0;
+  --radius-md: 0;
+  --radius-sm: 0;
+  --radius-xs: 0;
+  --radius-2xl: 0;
+  --font-sans: "NotoSansTC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+.dark {
+  --color-fd-background: #121517;
+  --color-fd-foreground: #ecede8;
+  --color-fd-card: #1b1f22;
+  --color-fd-card-foreground: #ecede8;
+  --color-fd-popover: #1b1f22;
+  --color-fd-popover-foreground: #ecede8;
+  --color-fd-muted: #0c0e10;
+  --color-fd-muted-foreground: #a2a8ab;
+  --color-fd-secondary: #1b1f22;
+  --color-fd-secondary-foreground: #ecede8;
+  --color-fd-accent: #1b1f22;
+  --color-fd-accent-foreground: #ecede8;
+  --color-fd-border: #2a2f33;
+  --color-fd-ring: #ecede8;
+  --color-fd-primary: #ff8a6b;
+  --color-fd-primary-foreground: #121517;
+}
+
+/* The neutral theme sets its own muted tones on the dark sidebar */
+.dark #nd-sidebar {
+  --color-fd-muted: #0c0e10;
+  --color-fd-secondary: #1b1f22;
+  --color-fd-muted-foreground: #a2a8ab;
+}
+
+html {
+  /* The Noto weights are real files: synthesis would only fake one */
+  font-synthesis: none;
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.75;
+  letter-spacing: 0.02em;
+}
+
+code,
+pre {
+  letter-spacing: 0;
+}
+
+.docs-wordmark {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.try-curl {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-block: 16px 24px;
+}
+
+.try-button {
+  min-height: 44px;
+  padding: 0 24px;
+  background: var(--color-fd-foreground);
+  color: var(--color-fd-background);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.try-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.try-output {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,38 @@
+---
+title: 分頁
+description: 所有列表端點共用的 cursor 分頁。
+---
+
+列表端點使用 cursor 分頁，所以翻頁時有新資料進來也不會重複或漏掉。
+
+| 參數 | 說明 |
+|---|---|
+| `limit` | 整數，1 至 100，預設 20 |
+| `cursor` | 上一頁的 `next_cursor`。內容不透明，請原樣傳回，不要解析 |
+
+```json
+{
+  "data": [],
+  "meta": {
+    "request_id": "req_01JBXR2M8E7QK4T9",
+    "pagination": { "limit": 20, "next_cursor": "eyJjIjoi…", "has_more": true }
+  }
+}
+```
+
+`next_cursor` 在沒有下一頁時為 `null`。格式錯誤的 cursor 回 400 `INVALID_CURSOR`。
+
+## 走完整個列表
+
+```js
+let cursor = null;
+do {
+  const query = new URLSearchParams({ limit: "100", ...(cursor ? { cursor } : {}) });
+  const response = await fetch(`https://api.shuoshuotw.xyz/v1/quotes?${query}`);
+  const { data, meta } = await response.json();
+  for (const quote of data) console.log(quote.content);
+  cursor = meta.pagination.next_cursor;
+} while (cursor);
+```
+
+近期熱門（`/v1/quotes/trending`）的排名會隨時間變動，所以不分頁，最多 50 則。

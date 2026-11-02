@@ -7,3 +7,5 @@ next-env.d.ts
 .env*
 !.env.example
 content/docs/api/
+content/docs/errors.mdx
+test-results/

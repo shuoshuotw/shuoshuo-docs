@@ -5,7 +5,8 @@ import { openapi } from "./openapi";
 const docs = defineDocs({ dir: "content/docs" });
 
 export const source = loader({
-  baseUrl: "/docs",
+  // Root, not /docs: Core's docs_url points at docs.shuoshuotw.xyz/errors#CODE
+  baseUrl: "/",
   source: docs.toFumadocsSource(),
   plugins: [openapi.loaderPlugin()],
 });

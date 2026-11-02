@@ -1,6 +1,55 @@
 ---
-title: 快速開始
-description: 說說 API 文件
+title: 三分鐘上手
+description: 一行指令，拿到一句說說。不用註冊，也不用金鑰。
 ---
 
-以 `GET /v1/health` 確認服務狀態。
+import { TryCurl } from "@/components/try-curl";
+
+```bash
+curl "https://api.shuoshuotw.xyz/v1/quotes/random?format=text"
+```
+
+<TryCurl />
+
+這就是全部。匿名呼叫每分鐘 60 次，對部落格或個人專案的頁面已經足夠。
+
+## 想要更多資訊
+
+拿掉 `format=text` 會回傳 JSON，包含類別、來源與提交者：
+
+```bash
+curl "https://api.shuoshuotw.xyz/v1/quotes/random"
+```
+
+```json
+{
+  "data": {
+    "id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+    "content": "人生就像一盒巧克力，你永遠不知道下一顆是什麼味道。",
+    "length": 25,
+    "category": { "key": "flim", "name": "影視" },
+    "source_from": "阿甘正傳",
+    "submitter": { "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7", "username": "小明", "deleted": false },
+    "stats": { "like_count": 128, "favorite_count": 34, "comment_count": 6 },
+    "status": "published",
+    "commit_from": "web",
+    "edited_at": null,
+    "created_at": "2026-10-28T07:12:44.000Z"
+  },
+  "meta": { "request_id": "req_01JBXR2M8E7QK4T9" }
+}
+```
+
+## 只要某些類別
+
+```bash
+curl "https://api.shuoshuotw.xyz/v1/quotes/random?categories=anime,game&max_length=40"
+```
+
+類別 key 列在[類別](/concepts/categories)。
+
+## 下一步
+
+- [快速開始](/quickstart)：取得 API Key，在 JavaScript 與 Python 裡呼叫，放到部落格上。
+- [安全](/security)：**把說說顯示在網頁上之前，請先讀這一頁**。說說是使用者提交的內容。
+- [API 參考](/api/getRandomQuote)：每個端點的參數、回應與可以直接試用的 Playground。

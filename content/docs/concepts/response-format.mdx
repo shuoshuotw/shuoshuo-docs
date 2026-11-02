@@ -1,0 +1,65 @@
+---
+title: 回應格式
+description: 所有端點共用的結構與慣例。
+---
+
+## 成功
+
+```json
+{
+  "data": {},
+  "meta": { "request_id": "req_01JBXR2M8E7QK4T9" }
+}
+```
+
+列表多一個 `meta.pagination`，見[分頁](/concepts/pagination)。
+
+## 失敗
+
+永遠是 JSON，即使請求 `format=text`：
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "status": 400,
+    "message": "請求參數不合規",
+    "message_en": "Request parameters are invalid",
+    "details": {
+      "fields": [
+        { "field": "limit", "code": "too_big", "message": "不可大於 100", "message_en": "Must be at most 100" }
+      ]
+    },
+    "docs_url": "https://docs.shuoshuotw.xyz/errors#VALIDATION_FAILED",
+    "request_id": "req_01JBXR2M8E7QK4T9"
+  }
+}
+```
+
+中英文訊息同時回傳，不依 `Accept-Language` 變化。程式請判斷 `code`，並能處理不認識的 code。
+
+## 慣例
+
+| 項目 | 規範 |
+|---|---|
+| 編碼 | 一律 UTF-8 |
+| 欄位命名 | `snake_case` |
+| 時間 | ISO 8601 UTC，含毫秒，如 `2026-11-01T09:30:00.000Z` |
+| ID | 小寫 UUID；路徑中不是 UUID 的 ID 回該資源的 404 |
+| 空值 | 欄位永遠存在，沒有值就是 `null`，不會省略 |
+| 未知查詢參數 | 忽略，方便自帶 cache buster |
+| 未知 JSON 欄位 | 拒絕，打錯欄位名不會默默成功 |
+| 請求大小 | JSON 上限 16 KB |
+| 追蹤 | 所有回應都有 `X-Request-Id` |
+
+## 長度
+
+`length` 與所有字數限制都以 Unicode code point 計算，所以組合 Emoji 會算成多個字。
+
+## 純文字
+
+`/v1/quotes/random` 與 `/v1/quotes/{id}` 支援 `format=text`：`Content-Type` 為 `text/plain; charset=utf-8`，內容只有說說本文，結尾沒有換行，說說 ID 放在 `X-Quote-Id` 標頭。
+
+## 快取
+
+公開列表與單一說說可能被 CDN 快取，數十秒內看到的內容可能不是最新。隨機端點與帶憑證的請求不走 CDN 快取。

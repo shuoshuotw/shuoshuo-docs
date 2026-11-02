@@ -1,0 +1,71 @@
+---
+title: 從一言遷移
+description: 一言與說說的參數、欄位對照。
+---
+
+說說的概念與一言相近。主要差別是類別改用看得懂的英文 key，錯誤會明確告訴你，並移除了有安全疑慮的格式。對照依 [一言開發者文件](https://developer.hitokoto.cn/sentence/)，2026-11-01 查閱。
+
+## 請求
+
+```bash
+# 一言
+curl "https://v1.hitokoto.cn/?c=a&c=c&encode=text"
+
+# 說說
+curl "https://api.shuoshuotw.xyz/v1/quotes/random?categories=anime,game&format=text"
+```
+
+| 一言 | 說說 | 差別 |
+|---|---|---|
+| `c=a&c=c`（單字母類別碼） | `categories=anime,game` | 英文 key 自帶語意，不需查表 |
+| 無 | `exclude_categories=ai` | 新增排除能力 |
+| 未知 `c` 當作「動畫」 | 400 與欄位錯誤 | 打錯字會立刻發現 |
+| `encode=text\|json\|js` | `format=text\|json` | 移除 `js`：回傳可執行腳本有 XSS 風險 |
+| `charset=utf-8\|gbk` | 移除 | 一律 UTF-8 |
+| `callback`（JSONP） | 移除 | CORS 已足夠，JSONP 是安全風險 |
+| `select` | 移除 | 不綁定 DOM |
+| `max_length` 預設 30 | 預設不限 | 預設值不該默默過濾資料 |
+
+## 回應
+
+```js
+// 一言
+const { hitokoto, from, from_who } = await response.json();
+
+// 說說
+const { data } = await response.json();
+const { content, source_from } = data;
+```
+
+| 一言 | 說說 |
+|---|---|
+| `hitokoto` | `content` |
+| `type: "f"` | `category: { key, name }` |
+| `from`、`from_who` | `source_from`（合併為一個自由填寫的欄位） |
+| `creator`、`creator_uid` | `submitter: { id, username, deleted }` |
+| `reviewer` | 移除：信任制沒有事前審核者 |
+| `created_at: "1621833280"` | ISO 8601 |
+| `id` + `uuid` | 只有 `id`（UUID） |
+
+## 限流與錯誤
+
+一言文件未定義錯誤格式與 HTTP 狀態；說說有完整的[錯誤碼](/errors)，也回傳[標準限流標頭](/rate-limits#標頭)，你可以自行退避。
+
+## 類別對照
+
+| 一言 | 說說 |
+|---|---|
+| `a` 動畫 | `anime` |
+| `b` 漫畫 | `manga` |
+| `c` 遊戲 | `game` |
+| `d` 文學 | `literature` |
+| `e` 原創 | `original` |
+| `f` 來自網路 | `internet` |
+| `g` 其他 | `other` |
+| `h` 影視 | `flim` |
+| `i` 詩詞 | `poetry` |
+| `j` 網易雲 | `music` |
+| `k` 哲學 | `philosophy` |
+| `l` 抖機靈 | 沒有直接對應，可用 `internet` 或 `anti-motiv` |
+
+說說另有 `ai` 與 `anti-motiv`（毒雞湯）。

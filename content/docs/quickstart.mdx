@@ -1,0 +1,100 @@
+---
+title: 快速開始
+description: 取得 API Key、送出第一個請求，再把說說放到部落格上。
+---
+
+## 第一個請求
+
+讀取不需要金鑰：
+
+```bash
+curl "https://api.shuoshuotw.xyz/v1/quotes/random"
+```
+
+## 取得 API Key
+
+需要更高的額度，或要替使用者寫入時才需要金鑰。
+
+1. 到 [shuoshuotw.xyz](https://shuoshuotw.xyz/login) 登入。
+2. 開啟[個人中心的 API Key](https://shuoshuotw.xyz/me/api-keys)，按「建立 API Key」。
+3. 為它命名並勾選需要的權限（見[認證](/authentication#scope)）。
+4. **立刻存下金鑰**。它只會顯示這一次，之後只看得到前綴。
+
+把金鑰放在環境變數裡，不要寫進程式碼：
+
+```bash
+export SHUOSHUO_API_KEY="shuoshuo_live_..."
+```
+
+用 `Authorization` 標頭帶上它：
+
+```bash
+curl -H "Authorization: Bearer $SHUOSHUO_API_KEY" "https://api.shuoshuotw.xyz/v1/quotes/random"
+```
+
+<Callout type="warn">金鑰絕對不能放在網址裡。查詢字串帶憑證會直接回 `CREDENTIAL_IN_QUERY`，因為網址會留在記錄檔與瀏覽紀錄裡。</Callout>
+
+## JavaScript
+
+```js
+const response = await fetch("https://api.shuoshuotw.xyz/v1/quotes/random");
+if (!response.ok) {
+  const { error } = await response.json();
+  throw new Error(`${error.code}: ${error.message}`);
+}
+const { data } = await response.json();
+console.log(`${data.content}——${data.source_from}`);
+```
+
+## Python
+
+```python
+import requests
+
+response = requests.get("https://api.shuoshuotw.xyz/v1/quotes/random", timeout=5)
+if not response.ok:
+    error = response.json()["error"]
+    raise RuntimeError(f"{error['code']}: {error['message']}")
+quote = response.json()["data"]
+print(f"{quote['content']}——{quote['source_from']}")
+```
+
+## 放到部落格上
+
+把這段貼進頁面，不需要金鑰：
+
+```html
+<p id="shuoshuo">載入中</p>
+<script>
+  fetch("https://api.shuoshuotw.xyz/v1/quotes/random?format=text")
+    .then((response) => (response.ok ? response.text() : Promise.reject(response.status)))
+    .then((text) => {
+      // textContent，不是 innerHTML：說說是使用者提交的內容
+      document.getElementById("shuoshuo").textContent = text;
+    })
+    .catch(() => {
+      document.getElementById("shuoshuo").remove();
+    });
+</script>
+```
+
+<Callout type="error">不要在網頁前端放 API Key，任何人都看得到。公開讀取不需要金鑰；真的需要時，請從你自己的伺服器呼叫。詳見[安全](/security)。</Callout>
+
+## 出錯時
+
+每個錯誤都是同一種格式，並附上說明頁連結：
+
+```json
+{
+  "error": {
+    "code": "NO_QUOTE_MATCHED",
+    "status": 404,
+    "message": "沒有符合條件的說說",
+    "message_en": "No quote matches these filters",
+    "docs_url": "https://docs.shuoshuotw.xyz/errors#NO_QUOTE_MATCHED",
+    "request_id": "req_01JBXR2M8E7QK4T9"
+  }
+}
+```
+
+程式請判斷 `code`，訊息文字可能調整。回報問題時附上 `request_id`。完整清單見[錯誤碼](/errors)。

@@ -1,0 +1,54 @@
+---
+title: 限流
+description: 額度表、回應標頭與退避範例。
+---
+
+## 額度
+
+每分鐘的請求數。沒有每日或每月上限。
+
+| 類別 | 匿名（IP） | 使用者 | API Key | 適用於 |
+|---|---|---|---|---|
+| 公開讀取 | 60 | 300 | 1,200（同帳號所有金鑰合計 3,000） | 說說、留言、公開個人頁 |
+| 個人讀取 | — | 120 | 300 | `/v1/me` |
+| 寫入 | — | 60 | 120 | 提交、編輯、留言、按讚、收藏 |
+| 敏感操作 | — | 10 | — | 隱私設定、檢舉、申訴 |
+
+少數帳號動作另有每小時上限，兩者都要符合：
+
+| 動作 | 每使用者 |
+|---|---|
+| API Key 建立、刪除 | 20 / 小時 |
+| API Key 重新產生 | 10 / 小時 |
+| 修改使用者名稱 | 5 / 小時 |
+| 刪除帳號 | 3 / 小時 |
+
+憑證驗證另有以 IP 計算的保護：每分鐘最多驗證 120 次，失敗最多 20 次。超過時回 429，`details.scope` 為 `auth_guard`。
+
+## 標頭
+
+| 標頭 | 意義 |
+|---|---|
+| `RateLimit-Limit` | 這個視窗的額度 |
+| `RateLimit-Remaining` | 剩餘次數 |
+| `RateLimit-Reset` | 距離重置的秒數 |
+| `Retry-After` | 僅 429，應該等待的秒數 |
+
+可被 CDN 快取的回應不帶 `RateLimit-*`，命中快取也不計入額度。
+
+## 超過額度時
+
+回 429 `RATE_LIMITED`。依 `Retry-After` 等待，不要立刻重試：
+
+```js
+async function withRetry(url, attempts = 3) {
+  for (let attempt = 0; ; attempt += 1) {
+    const response = await fetch(url);
+    if (response.status !== 429 || attempt === attempts) return response;
+    const seconds = Number(response.headers.get("Retry-After") ?? 1);
+    await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+  }
+}
+```
+
+5xx 也可以用同樣的方式重試；4xx 不要重試，內容沒變，結果也不會變。

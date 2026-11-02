@@ -1,0 +1,26 @@
+---
+title: 類別
+description: 13 個類別的 key 與名稱。
+---
+
+篩選時使用英文 key，多個以逗號分隔：`categories=anime,game`。打錯 key 會回 400，不會默默回傳別的類別。
+
+| Key | 名稱 |
+|---|---|
+| `anime` | 動畫 |
+| `manga` | 漫畫 |
+| `game` | 遊戲 |
+| `music` | 音樂 |
+| `literature` | 文學 |
+| `original` | 原創 |
+| `flim` | 影視 |
+| `poetry` | 詩詞 |
+| `internet` | 網路 |
+| `philosophy` | 哲學 |
+| `anti-motiv` | 毒雞湯 |
+| `ai` | AI |
+| `other` | 其他 |
+
+也可以用 [`GET /v1/categories`](/api/listCategories) 取得這份清單。
+
+`categories` 與 `exclude_categories` 不可併用，否則回 400 `CATEGORY_FILTER_CONFLICT`。篩選後沒有任何說說時回 404 `NO_QUOTE_MATCHED`。
