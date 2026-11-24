@@ -1,22 +1,37 @@
-import { readFileSync, writeFileSync } from "node:fs";
-import { generateFiles } from "fumadocs-openapi";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { type Document, generateFiles } from "fumadocs-openapi";
 import { createOpenAPI } from "fumadocs-openapi/server";
 import { parse } from "yaml";
 
-type Operation = { operationId: string; tags: string[] };
+type Operation = { operationId: string; tags: string[]; "x-auth": string };
 type Spec = { tags: { name: string }[]; paths: Record<string, Record<string, Operation>> };
 type ErrorEntry = { status: number; message: string; message_en: string; condition: string };
 
+// Only what an API Key can call gets a page: open to anyone, signed with a key or a user's JWT, or a public list. The
+// snapshot itself stays Core's whole contract (CI compares it), so the rest is left out here
+const BY_KEY = new Set(["public", "jwt_or_key", "listing"]);
+const spec = parse(readFileSync("openapi/openapi.yaml", "utf8")) as Spec;
+for (const [path, methods] of Object.entries(spec.paths)) {
+  for (const [method, value] of Object.entries(methods)) if (value?.operationId && !BY_KEY.has(value["x-auth"])) delete methods[method];
+  if (!Object.values(methods).some((value) => value?.operationId)) delete spec.paths[path];
+}
+
+// Pages of operations left out earlier would stay behind and still be built
+rmSync("./content/docs/api", { recursive: true, force: true });
 await generateFiles({
-  input: createOpenAPI({ input: ["./openapi/openapi.yaml"] }),
+  // Under the snapshot's own name, which the pages load it by at build
+  input: createOpenAPI({ input: { "./openapi/openapi.yaml": spec as unknown as Document } }),
   output: "./content/docs/api",
   includeDescription: true,
 });
 
-// Flat URLs, so a file name never holds Chinese; the sidebar still groups them by tag
-const spec = parse(readFileSync("openapi/openapi.yaml", "utf8")) as Spec;
+// Flat URLs, so a file name never holds Chinese; the sidebar still groups them by tag, and a tag left with nothing
+// an API Key can call is left out
 const operations = Object.values(spec.paths).flatMap((methods) => Object.values(methods).filter((value) => value?.operationId));
-const pages = spec.tags.flatMap(({ name }) => [`---${name}---`, ...operations.filter(({ tags }) => tags?.includes(name)).map(({ operationId }) => operationId)]);
+const pages = spec.tags.flatMap(({ name }) => {
+  const own = operations.filter(({ tags }) => tags?.includes(name)).map(({ operationId }) => operationId);
+  return own.length ? [`---${name}---`, ...own] : [];
+});
 writeFileSync("content/docs/api/meta.json", `${JSON.stringify({ title: "API 參考", pages }, null, 2)}\n`);
 
 // §14.1: the error page cannot drift from errors.yaml. Each anchor is the code itself, which is what docs_url points to.

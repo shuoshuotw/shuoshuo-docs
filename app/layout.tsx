@@ -1,7 +1,8 @@
 import { i18nProvider } from "fumadocs-ui/i18n";
-import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Motion } from "@/components/motion";
+import { Providers } from "@/components/providers";
 import { translations } from "@/lib/translations";
 import "./global.css";
 
@@ -12,15 +13,18 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <html lang="zh-Hant-TW" suppressHydrationWarning>
+    // Smooth jumps within a page (the contents' links), and Next turns it off while it changes page (version 16)
+    <html lang="zh-Hant-TW" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link href="https://font.emtech.cc/css/NotoSansTC/400" rel="stylesheet" />
         <link href="https://font.emtech.cc/css/NotoSansTC/700" rel="stylesheet" />
+        <link href="https://font.emtech.cc/css/ChenYuLuoYan/100" rel="stylesheet" />
       </head>
       <body>
-        <RootProvider i18n={i18nProvider(translations)} search={{ options: { type: "static" } }}>
+        <Providers i18n={i18nProvider(translations)}>
           {children}
-        </RootProvider>
+          <Motion />
+        </Providers>
       </body>
     </html>
   );

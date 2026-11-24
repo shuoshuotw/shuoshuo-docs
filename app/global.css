@@ -3,69 +3,588 @@
 @import "fumadocs-ui/css/preset.css";
 @import "fumadocs-openapi/css/preset.css";
 
-/* §12.3 mapped onto Fumadocs (§14.1). Read mode: the workbench's grey and ink, square corners, no picking animation. */
+/* §12.3 mapped onto Fumadocs (§14.1), in the site's own world: its ground, ink and red, its rounded glass, and a
+   still wash of the gradient the site flows with. Read mode: no moving light, no glow, no pull toward the pointer,
+   and the system's own cursor. */
 :root {
-  --color-fd-background: #e6e7e3;
-  --color-fd-foreground: #161a1d;
-  --color-fd-card: #f5f5f1;
-  --color-fd-card-foreground: #161a1d;
-  --color-fd-popover: #f5f5f1;
-  --color-fd-popover-foreground: #161a1d;
-  --color-fd-muted: #d8dad5;
-  --color-fd-muted-foreground: #50575c;
-  --color-fd-secondary: #d8dad5;
-  --color-fd-secondary-foreground: #161a1d;
-  --color-fd-accent: #d8dad5;
-  --color-fd-accent-foreground: #161a1d;
-  --color-fd-border: #d8dad5;
-  --color-fd-ring: #161a1d;
-  --color-fd-primary: #b92c1a;
+  --ground: #f5f5f3;
+  --brand-red: #e0402f;
+  --line: rgb(12 12 14 / 0.09);
+  --shadow-soft: 0 1px 2px rgb(12 12 14 / 0.06), 0 12px 32px -12px rgb(12 12 14 / 0.18);
+  --wash-1: #dcefe5;
+  --wash-2: #dce8f5;
+  --wash-3: #f5dfdd;
+  --wash-4: #f2e7d4;
+  /* The main site's motion tokens (shuoshuo-client styles/tokens.css) */
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: ease-in-out;
+  --distance-base: 8px;
+  --blur-small: 2px;
+  /* transitions.dev icon swap and text states swap (the sidebar's part button, components/motion.tsx installPartSwap) */
+  --icon-swap-dur: 250ms;
+  --icon-swap-blur: 2px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: ease-in-out;
+  --text-swap-dur: 150ms;
+  --text-swap-translate-y: 4px;
+  --text-swap-blur: 2px;
+  --text-swap-ease: ease-in-out;
+  --color-fd-background: #f5f5f3;
+  --color-fd-foreground: #0c0c0e;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #0c0c0e;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #0c0c0e;
+  --color-fd-muted: #ebebe8;
+  --color-fd-muted-foreground: #5b5e64;
+  --color-fd-secondary: #ffffff;
+  --color-fd-secondary-foreground: #0c0c0e;
+  --color-fd-accent: rgb(12 12 14 / 0.06);
+  --color-fd-accent-foreground: #0c0c0e;
+  --color-fd-border: rgb(12 12 14 / 0.09);
+  --color-fd-ring: #0c0c0e;
+  --color-fd-primary: #c8321f;
   --color-fd-primary-foreground: #ffffff;
-  --radius-xl: 0;
-  --radius-lg: 0;
-  --radius-md: 0;
-  --radius-sm: 0;
-  --radius-xs: 0;
-  --radius-2xl: 0;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
   --font-sans: "NotoSansTC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  --font-quote: "ChenYuLuoYan", var(--font-sans);
 }
 
 .dark {
-  --color-fd-background: #121517;
-  --color-fd-foreground: #ecede8;
-  --color-fd-card: #1b1f22;
-  --color-fd-card-foreground: #ecede8;
-  --color-fd-popover: #1b1f22;
-  --color-fd-popover-foreground: #ecede8;
-  --color-fd-muted: #0c0e10;
-  --color-fd-muted-foreground: #a2a8ab;
-  --color-fd-secondary: #1b1f22;
-  --color-fd-secondary-foreground: #ecede8;
-  --color-fd-accent: #1b1f22;
-  --color-fd-accent-foreground: #ecede8;
-  --color-fd-border: #2a2f33;
-  --color-fd-ring: #ecede8;
-  --color-fd-primary: #ff8a6b;
-  --color-fd-primary-foreground: #121517;
+  --ground: #0a0a0c;
+  --line: rgb(255 255 255 / 0.08);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.7);
+  --wash-1: #16282a;
+  --wash-2: #18223a;
+  --wash-3: #2c1a2a;
+  --wash-4: #2c2216;
+  --color-fd-background: #0a0a0c;
+  --color-fd-foreground: #f2f2f0;
+  --color-fd-card: #141417;
+  --color-fd-card-foreground: #f2f2f0;
+  --color-fd-popover: #141417;
+  --color-fd-popover-foreground: #f2f2f0;
+  --color-fd-muted: #1b1b1f;
+  --color-fd-muted-foreground: #9d9ea6;
+  --color-fd-secondary: #141417;
+  --color-fd-secondary-foreground: #f2f2f0;
+  --color-fd-accent: rgb(255 255 255 / 0.06);
+  --color-fd-accent-foreground: #f2f2f0;
+  --color-fd-border: rgb(255 255 255 / 0.08);
+  --color-fd-ring: #f2f2f0;
+  --color-fd-primary: #ff6b57;
+  --color-fd-primary-foreground: #0a0a0c;
 }
 
 /* The neutral theme sets its own muted tones on the dark sidebar */
 .dark #nd-sidebar {
-  --color-fd-muted: #0c0e10;
-  --color-fd-secondary: #1b1f22;
-  --color-fd-muted-foreground: #a2a8ab;
+  --color-fd-muted: #1b1b1f;
+  --color-fd-secondary: #141417;
+  --color-fd-muted-foreground: #9d9ea6;
+}
+
+/* ---------- motion: the main site's (SPEC §13.3), on Fumadocs' own parts ---------- */
+
+/* Fumadocs' animations at the main site's pace: the search dialog as M-05 (rises from 0.96; opens in 250, closes in
+   150), menus and popovers as M-19, folders as M-23 (open 250, close 150), the phone's sidebar as a panel (400 / 350) */
+@theme {
+  --animate-fd-fade-in: fd-fade-in 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-fade-out: fd-fade-out 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-dialog-in: fd-dialog-in 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-dialog-out: fd-dialog-out 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-popover-in: fd-popover-in 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-popover-out: fd-popover-out 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-enterFromLeft: fd-enterFromLeft 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-enterFromRight: fd-enterFromRight 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-exitToLeft: fd-exitToLeft 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-exitToRight: fd-exitToRight 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-sidebar-in: fd-sidebar-in 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-sidebar-out: fd-sidebar-out 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-collapsible-down: fd-collapsible-down 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-collapsible-up: fd-collapsible-up 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-accordion-down: fd-accordion-down 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-accordion-up: fd-accordion-up 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-nav-menu-in: fd-nav-menu-in 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fd-nav-menu-out: fd-nav-menu-out 150ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* A dialog rises from just under its size and sinks back as it goes (transitions.dev modal); a menu grows a little
+     less, and shrinks less still as it goes. Here and not outside: Tailwind writes a theme's keyframes after the rest */
+  @keyframes fd-dialog-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+
+  @keyframes fd-dialog-out {
+    to {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+
+  @keyframes fd-popover-in {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+
+  @keyframes fd-popover-out {
+    to {
+      opacity: 0;
+      transform: scale(0.99);
+    }
+  }
+}
+
+/* M-22: the tab's block slides to the one chosen */
+[role="tablist"] > [role="presentation"] {
+  transition-timing-function: var(--ease-smooth-out);
+}
+
+/* M-12: a page comes in, the bars and the sidebar stay put. It comes from where it lies in the sidebar, below or above
+   the page left, or sideways from the button pressed at a page's foot (components/page-turn.tsx) */
+#nd-page {
+  animation: page-in 300ms var(--ease-smooth-out);
+}
+
+/* The back office's step to the next case (shuoshuo-client styles/pages.css me-in), quicker: 24px out of a 3px blur
+   in 300ms, after the page left has slid away (components/page-turn.tsx) */
+:root {
+  --turn-distance: 24px;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    translate: var(--turn-x, 0px) var(--turn-y, var(--turn-distance));
+  }
+}
+
+html[data-turn="up"] {
+  --turn-y: calc(var(--turn-distance) * -1);
+}
+
+html[data-turn="next"] {
+  --turn-x: var(--turn-distance);
+  --turn-y: 0px;
+}
+
+html[data-turn="previous"] {
+  --turn-x: calc(var(--turn-distance) * -1);
+  --turn-y: 0px;
+}
+
+/* transitions.dev's "Learn more hover" on the chevrons of the buttons at a page's foot (components/pager.tsx): the
+   chevron slides the way it points and its arms spread apart about its tip; it eases back as the pointer leaves */
+:root {
+  --learn-shift: 2px;
+  --learn-spread: 8deg;
+  --learn-in: 350ms;
+  --learn-out: 350ms;
+  --learn-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.t-learn-chevron {
+  display: inline-flex;
+  flex: none;
+  margin-inline: -4px;
+  transform: translateX(0);
+  transition: transform var(--learn-out) var(--learn-ease);
+}
+
+.t-learn-arm {
+  transform-box: view-box;
+  transform-origin: 10px 8px;
+  vector-effect: non-scaling-stroke;
+  transition: transform var(--learn-out) var(--learn-ease);
+}
+
+.t-learn[data-pager="previous"] .t-learn-arm {
+  transform-origin: 6px 8px;
+}
+
+.t-learn:hover .t-learn-chevron {
+  transform: translateX(var(--learn-shift));
+  transition-duration: var(--learn-in);
+}
+
+.t-learn[data-pager="previous"]:hover .t-learn-chevron {
+  transform: translateX(calc(var(--learn-shift) * -1));
+}
+
+.t-learn:hover .t-learn-arm {
+  transition-duration: var(--learn-in);
+}
+
+.t-learn:hover .t-learn-arm-top,
+.t-learn[data-pager="previous"]:hover .t-learn-arm-bot {
+  transform: rotate(var(--learn-spread));
+}
+
+.t-learn:hover .t-learn-arm-bot,
+.t-learn[data-pager="previous"]:hover .t-learn-arm-top {
+  transform: rotate(calc(var(--learn-spread) * -1));
+}
+
+/* Read to the end: on the phone a green disc with a white tick, on the desk a tick in the line's own orange */
+:root {
+  --done: #16a34a;
+}
+
+.dark {
+  --done: #22c55e;
+}
+
+/* The desk (components/toc-done.tsx): the dot at the foot of the line stays where it is, and a second one drops from
+   it straight down the line to the tick's corner; there it gives way to the tick's two strokes, which grow out of the
+   corner. Read back up, it goes the way it came: the strokes draw back into the corner and the dot rises into the
+   line's own */
+.toc-done {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 18px;
+  /* Its corner (10 of 20) under the line, which runs 9.5px in from the column's edge */
+  margin-inline-start: -0.5px;
+  color: var(--color-fd-primary);
+}
+
+.toc-done svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Each stroke drawn out from the corner (pathLength 1) */
+.toc-done path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+/* The dropping dot, the line's own 4px, set on the corner */
+.toc-done::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0;
+}
+
+.toc-done[data-state="in"]::before {
+  animation: toc-dot-drop 420ms forwards;
+}
+
+.toc-done[data-state="in"] path {
+  animation: toc-stroke-grow 260ms var(--ease-smooth-out) 320ms forwards;
+}
+
+.toc-done[data-state="out"] path {
+  stroke-dashoffset: 0;
+  animation: toc-stroke-back 220ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.toc-done[data-state="out"]::before {
+  animation: toc-dot-rise 480ms forwards;
+}
+
+/* Down the line, at the pace of something let go, then into the strokes */
+@keyframes toc-dot-drop {
+  0% {
+    opacity: 1;
+    translate: var(--from-x, 0px) var(--from-y, -20px);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
+  }
+
+  76% {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+}
+
+@keyframes toc-dot-rise {
+  0%,
+  38% {
+    opacity: 0;
+    translate: 0 0;
+  }
+
+  42% {
+    opacity: 1;
+    translate: 0 0;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
+  }
+
+  96% {
+    opacity: 1;
+    translate: var(--from-x, 0px) var(--from-y, -20px);
+  }
+
+  100% {
+    opacity: 0;
+    translate: var(--from-x, 0px) var(--from-y, -20px);
+  }
+}
+
+@keyframes toc-stroke-grow {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes toc-stroke-back {
+  to {
+    stroke-dashoffset: 1;
+  }
+}
+
+/* The phone's reading ring: read to the end, it closes and gives way to a green disc of its own size, on which the
+   tick is drawn; read back up, the tick is taken off, the disc goes and the ring comes back, each in turn. Carried by
+   transitions, so the way back plays as well. transitions.dev's "Spinner to check morph", rebuilt from its
+   description, as its source is only in the paid set */
+[data-toc-popover-trigger] {
+  position: relative;
+}
+
+[data-toc-popover-trigger]::before,
+[data-toc-popover-trigger]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  pointer-events: none;
+}
+
+/* The disc: the ring's own 18px */
+[data-toc-popover-trigger]::before {
+  inset-inline-start: 16px;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border-radius: 9999px;
+  background: var(--done);
+  opacity: 0;
+  scale: 0.6;
+  transition:
+    opacity 220ms var(--ease-smooth-out) 80ms,
+    scale 220ms var(--ease-smooth-out) 80ms;
+}
+
+/* The tick, at the size it has, over the disc */
+[data-toc-popover-trigger]::after {
+  inset-inline-start: 13px;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  background: #fff;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 12.5 10.5 16 17 8.5'/%3E%3C/svg%3E") center / 20px no-repeat;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 180ms var(--ease-smooth-out);
+}
+
+@media (min-width: 768px) {
+  [data-toc-popover-trigger]::before {
+    inset-inline-start: 24px;
+  }
+
+  [data-toc-popover-trigger]::after {
+    inset-inline-start: 21px;
+  }
+}
+
+[data-toc-popover-trigger] > svg[role="progressbar"] {
+  transition:
+    opacity 200ms var(--ease-smooth-out) 160ms,
+    scale 200ms var(--ease-smooth-out) 160ms;
+}
+
+[data-toc-popover-trigger]:has(> svg[aria-valuenow="1"]) > svg[role="progressbar"] {
+  opacity: 0;
+  scale: 0.85;
+  transition-delay: 0ms;
+}
+
+[data-toc-popover-trigger]:has(> svg[aria-valuenow="1"])::before {
+  opacity: 1;
+  scale: 1;
+  transition-delay: 60ms;
+}
+
+[data-toc-popover-trigger]:has(> svg[aria-valuenow="1"])::after {
+  clip-path: inset(0);
+  transition-duration: 300ms;
+  transition-delay: 200ms;
+}
+
+/* Copy buttons, all of them (components/motion.tsx installCopySwap): the icon leaving is laid over the one coming, and
+   the tick is green */
+button:has(> svg:is(.lucide-clipboard, .lucide-copy, .lucide-link, .lucide-check, .lucide-copy-check)) {
+  position: relative;
+}
+
+.copy-ghost {
+  position: absolute;
+  pointer-events: none;
+}
+
+button > svg.lucide-check {
+  color: var(--done);
+}
+/* The ripple a click sends out (components/motion.tsx): in a layer of the control's shape, under its contents */
+.ripple-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ripple-disc {
+  position: absolute;
+  border-radius: 100%;
+  background: currentColor;
+}
+
+/* Unit-length strokes, so a press on the wordmark can lift them off and write them again */
+.logo-stroke {
+  stroke-dasharray: 1 1;
+}
+
+/* M-21: the theme toggle crossfades the old page into the new one (Fumadocs' own view transition), at the main
+   site's pace */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-medium);
+  animation-timing-function: var(--ease-in-out);
+}
+
+/* Reduced motion: what opens or comes in only fades; folders, the theme and a copied tick change at once */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animate-fd-dialog-in: fd-fade-in 180ms ease-out;
+    --animate-fd-dialog-out: fd-fade-out 180ms ease-in;
+    --animate-fd-popover-in: fd-fade-in 150ms ease-out;
+    --animate-fd-popover-out: fd-fade-out 150ms ease-in;
+    --animate-fd-sidebar-in: fd-fade-in 180ms ease-out;
+    --animate-fd-sidebar-out: fd-fade-out 180ms ease-in;
+    --animate-fd-collapsible-down: none;
+    --animate-fd-collapsible-up: none;
+    --animate-fd-accordion-down: none;
+    --animate-fd-accordion-up: none;
+  }
+
+  #nd-page {
+    animation: page-in-reduced var(--duration-quick) linear;
+  }
+
+  @keyframes page-in-reduced {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .t-learn-chevron,
+  .t-learn-arm {
+    transition: none !important;
+  }
+
+  /* Read to the end, the tick is simply there; read back up, simply gone; no dot travels */
+  .toc-done::before,
+  .toc-done svg,
+  .toc-done path {
+    animation: none !important;
+  }
+
+  .toc-done[data-state="in"] path {
+    stroke-dashoffset: 0;
+  }
+
+  .toc-done[data-state="out"] svg {
+    opacity: 0;
+  }
+
+  [data-toc-popover-trigger] > svg[role="progressbar"],
+  [data-toc-popover-trigger]::before,
+  [data-toc-popover-trigger]::after {
+    transition: none !important;
+  }
+
+  #nd-page [role="tabpanel"] > .prose-no-margin > * {
+    animation: none;
+  }
+
+  #nd-docs-layout,
+  #nd-sidebar,
+  [data-sidebar-panel] {
+    transition-duration: 0ms !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }
 
 html {
+  background: var(--ground);
   /* The Noto weights are real files: synthesis would only fake one */
   font-synthesis: none;
 }
 
 body {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
   font-family: var(--font-sans);
   line-height: 1.75;
   letter-spacing: 0.02em;
+}
+
+/* The site's gradient, held still: four soft fields of its colours under the page, fixed while it scrolls */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 50% at 0% 0%, var(--wash-1), transparent 70%),
+    radial-gradient(50% 45% at 100% 8%, var(--wash-2), transparent 70%),
+    radial-gradient(55% 50% at 100% 100%, var(--wash-3), transparent 70%),
+    radial-gradient(50% 45% at 0% 100%, var(--wash-4), transparent 70%);
+  pointer-events: none;
+}
+
+/* The bars and the sidebar let the wash through as glass */
+#nd-nav,
+#nd-sidebar,
+#nd-subnav {
+  background: color-mix(in oklab, var(--color-fd-background) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
 }
 
 code,
@@ -73,25 +592,556 @@ pre {
   letter-spacing: 0;
 }
 
+/* The sidebar's foot: the GitHub mark with the organisation's name beside it */
+.docs-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-inline-end: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .docs-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-size: 20px;
   font-weight: 700;
+}
+
+/* On a wide screen the layout centres in 97rem and its sidebar's panel reached from the window's edge to the page,
+   its links at the far end of a broad blank. The panel keeps its own width at the window's edge; the page and its
+   contents stay centred together */
+#nd-sidebar {
+  width: var(--fd-sidebar-width);
+}
+
+/* The search shortcut's held key is drawn as its symbol (components/providers.tsx) */
+[data-search-full] kbd {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The API's request methods (fumadocs-openapi's badge), in the sidebar, on a page's head and on the buttons at its foot,
+   in the text's own face rather than the code's */
+.font-mono.font-medium:is(.text-green-600, .text-yellow-600, .text-red-600, .text-blue-600, .text-orange-600) {
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+}
+
+/* An API page lays its examples in a column of their own once it is wide enough (fumadocs-openapi: 400px beside the
+   rest, past 56rem). The buttons at its foot keep to the left column with the rest instead of reaching under them */
+#nd-page:has([class*="@4xl:w-[400px]"]) {
+  container-type: inline-size;
+}
+
+@container (min-width: 56rem) {
+  .docs-pager {
+    margin-inline-end: calc(400px + 1.5rem);
+  }
+}
+
+/* The main site's ScrollShadow: two veils of the ground at the window's top and bottom edges, over the page. The top
+   one comes in over the first 80px scrolled, the bottom one goes over the last 80px, both run by the scroll itself; a
+   page too short to scroll shows neither. The sidebar, the bars and the contents' column stay above them */
+:root {
+  --veil: color-mix(in oklab, var(--ground) 92%, transparent);
+}
+
+#nd-docs-layout::before,
+#nd-docs-layout::after {
+  content: "";
+  position: fixed;
+  inset-inline: 0;
+  z-index: 5;
+  height: 72px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#nd-docs-layout::before {
+  top: var(--fd-docs-row-3, 0px);
+  background: linear-gradient(var(--veil), transparent);
+}
+
+#nd-docs-layout::after {
+  bottom: 0;
+  background: linear-gradient(transparent, var(--veil));
+}
+
+@supports (animation-timeline: scroll()) {
+  #nd-docs-layout::before {
+    animation: veil-in linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 80px;
+  }
+
+  #nd-docs-layout::after {
+    animation: veil-out linear both;
+    animation-timeline: scroll(root);
+    animation-range: calc(100% - 80px) 100%;
+  }
+}
+
+@keyframes veil-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes veil-out {
+  from {
+    opacity: 1;
+  }
+}
+
+#nd-toc {
+  z-index: 6;
+}
+
+/* One highlight glides under the pointer from row to row of the sidebar (components/motion.tsx); the rows' own hover
+   colour gives way to it. A row's mark as the page shown stays its own */
+#nd-sidebar [data-radix-scroll-area-viewport] {
+  position: relative;
+}
+
+#nd-sidebar [data-radix-scroll-area-viewport] :is(a[data-active="false"], button[aria-expanded]):hover {
+  background-color: transparent;
+}
+
+.sidebar-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: var(--radius-lg);
+  background: var(--color-fd-accent);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 240ms var(--ease-smooth-out),
+    width 240ms var(--ease-smooth-out),
+    height 240ms var(--ease-smooth-out),
+    opacity var(--duration-quick) var(--ease-smooth-out);
+}
+
+.sidebar-glow[data-on] {
+  opacity: 1;
+}
+
+/* The button naming the part of the docs being read, its icon and name changed with the part (components/motion.tsx
+   installPartSwap): transitions.dev's icon swap and text states swap as they come */
+.t-icon-swap {
+  position: relative;
+  display: inline-grid;
+}
+.t-icon-swap .t-icon {
+  grid-area: 1 / 1;
+  transition:
+    opacity   var(--icon-swap-dur) var(--icon-swap-ease),
+    filter    var(--icon-swap-dur) var(--icon-swap-ease),
+    transform var(--icon-swap-dur) var(--icon-swap-ease);
+  /* No will-change: it would freeze each icon's raster at its 0.25 start
+     scale, so a large icon scales up blurry and pixelated. */
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="a"],
+.t-icon-swap[data-state="b"] .t-icon[data-icon="b"] {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="b"],
+.t-icon-swap[data-state="b"] .t-icon[data-icon="a"] {
+  opacity: 0;
+  filter: blur(var(--icon-swap-blur));
+  transform: scale(var(--icon-swap-start-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-icon-swap .t-icon { transition: none !important; }
+}
+
+.t-text-swap {
+  display: inline-block;
+  transform: translateY(0);
+  filter: blur(0);
+  opacity: 1;
+  transition:
+    transform var(--text-swap-dur) var(--text-swap-ease),
+    filter    var(--text-swap-dur) var(--text-swap-ease),
+    opacity   var(--text-swap-dur) var(--text-swap-ease);
+  will-change: transform, filter, opacity;
+}
+.t-text-swap.is-exit {
+  transform: translateY(calc(var(--text-swap-translate-y) * -1));
+  filter: blur(var(--text-swap-blur));
+  opacity: 0;
+}
+.t-text-swap.is-enter-start {
+  transform: translateY(var(--text-swap-translate-y));
+  filter: blur(var(--text-swap-blur));
+  opacity: 0;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-text-swap { transition: none !important; }
+}
+
+/* The name leaving lies over the name coming, where it stood */
+:is(#nd-sidebar, #nd-sidebar-mobile) button:has(> svg.lucide-chevrons-up-down) > div:has(> p) {
+  position: relative;
+}
+
+.t-text-swap.part-ghost {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The page shown's mark on its way from one row to the next (components/motion.tsx installSidebarMark): Fumadocs'
+   own (bg-fd-primary/10, rounded-lg), the row reached keeping its own and its side line back until it lands */
+.sidebar-mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--color-fd-primary) 10%, transparent);
+  pointer-events: none;
+}
+
+#nd-sidebar a[data-marking] {
+  background-color: transparent;
+}
+
+#nd-sidebar a[data-marking]::before {
+  opacity: 0;
+}
+
+/* An API page's response by status code: switched, only the words saying what the code means (成功, 請求不合規…)
+   come in as transitions.dev's number pop-in, rising 8px out of a 2px blur; what is under them changes as before */
+#nd-page [role="tabpanel"]:not([hidden]) > .prose-no-margin.text-fd-muted-foreground > * {
+  animation: tab-pop-in 500ms cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+@keyframes tab-pop-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    translate: 0 8px;
+  }
+}
+
+/* The docs' menus open and fold as the main site's select (components/motion.tsx installMenus). Fumadocs' own grow
+   and shrink is taken off the popover, and both kinds of menu are held on the page while they fold: Radix and Base UI
+   take a menu away once the animation they see has ended */
+[data-radix-popper-content-wrapper] > [role="dialog"] {
+  animation: none;
+}
+
+[data-radix-popper-content-wrapper] > [role="dialog"][data-state="closed"],
+[data-base-ui-portal] [role="presentation"][data-ending-style]:has(> [role="listbox"]) {
+  animation: menu-hold 460ms linear;
+}
+
+@keyframes menu-hold {
+  from {
+    visibility: visible;
+  }
+
+  to {
+    visibility: visible;
+  }
+}
+
+/* Callouts (components/callout.tsx): lit by a lamp of their own colour at the icon instead of a rule at the edge. The
+   lamp breathes, brightening and dimming slowly; the icon sits bare in its light, and the words at the reading size.
+   Their colours are the site's own rather than Fumadocs' */
+.callout {
+  --callout-color: #3b82f6;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-block: 24px;
+  padding: 18px 22px 18px 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--callout-color) 26%, var(--color-fd-border));
+  border-radius: var(--radius-xl);
+  background: var(--color-fd-card);
+  color: var(--color-fd-foreground);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.callout[data-type="warning"] {
+  --callout-color: #d97706;
+}
+
+.callout[data-type="error"] {
+  --callout-color: var(--brand-red);
+}
+
+.callout[data-type="success"] {
+  --callout-color: var(--done);
+}
+
+.callout[data-type="idea"] {
+  --callout-color: #ca8a04;
+}
+
+.dark .callout {
+  --callout-color: #60a5fa;
+}
+
+.dark .callout[data-type="warning"] {
+  --callout-color: #fbbf24;
+}
+
+.dark .callout[data-type="error"] {
+  --callout-color: #ff6b57;
+}
+
+.dark .callout[data-type="idea"] {
+  --callout-color: #facc15;
+}
+
+.callout::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(280px 170px at 30px 30px, color-mix(in oklab, var(--callout-color) 22%, transparent), transparent 75%),
+    linear-gradient(90deg, color-mix(in oklab, var(--callout-color) 6%, transparent), transparent 60%);
+  pointer-events: none;
+  animation: callout-breathe 4.2s ease-in-out infinite alternate;
+}
+
+@keyframes callout-breathe {
+  from {
+    opacity: 0.25;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* The lamp itself, glowing brighter and dimmer with the light it throws */
+.callout-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: var(--callout-color);
+  animation: callout-glow 4.2s ease-in-out infinite alternate;
+}
+
+@keyframes callout-glow {
+  from {
+    filter: drop-shadow(0 0 2px color-mix(in oklab, var(--callout-color) 30%, transparent));
+  }
+
+  to {
+    filter: drop-shadow(0 0 8px color-mix(in oklab, var(--callout-color) 70%, transparent));
+  }
+}
+
+.callout-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.callout-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.callout-title {
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .callout::before,
+  .callout-icon {
+    animation: none;
+  }
+}
+
+/* The sidebar, a little wider than Fumadocs' 268px, so the API's names and their methods sit side by side */
+@media (min-width: 768px) {
+  #nd-docs-layout {
+    --fd-sidebar-width: 300px;
+  }
+}
+
+/* The sidebar folded away (the button by the wordmark) narrows in place into a slim rail at the window's edge, the
+   page's column widening with it on the same clock: what it holds fades as it goes, its logo stays at the top, and
+   the buttons to open it again and to search come in under the logo. Opened, it widens back out. Fumadocs' own fold
+   slid the panel away as a floating card, left the two buttons in a small box over the page, and peeked the card
+   back in under a pointer at the window's edge; the rail is the one way back */
+@media (min-width: 768px) {
+  #nd-docs-layout {
+    transition-duration: var(--duration-medium);
+    transition-timing-function: var(--ease-smooth-out);
+  }
+
+  #nd-docs-layout[data-sidebar-collapsed="true"] {
+    --fd-sidebar-col: 56px !important;
+  }
+
+  /* Its contents keep their width at its left edge, and the panel's own edge narrows over them. Clipped, not hidden:
+     a box that hides its overflow can be scrolled, and opening it, the focus on its own button at the far end of the
+     wordmark's row scrolled the contents 244px over, so the logo slid in from off the screen */
+  #nd-sidebar {
+    align-items: flex-start;
+    overflow: clip;
+    transition: width var(--duration-medium) var(--ease-smooth-out);
+  }
+
+  #nd-sidebar[data-collapsed="true"] {
+    inset-block: 0;
+    width: 56px;
+    border-width: 0 1px 0 0;
+    border-radius: 0;
+    box-shadow: none;
+    translate: none;
+  }
+
+  /* Their hover keeps its fade too (the search box, the menu over it): set alone, this took the colours' own off */
+  #nd-sidebar > *,
+  #nd-sidebar > :first-child > *,
+  #nd-sidebar > :first-child > :first-child > button,
+  .docs-wordmark-text {
+    transition:
+      opacity var(--duration-fast) var(--ease-smooth-out) 100ms,
+      color var(--duration-fast) var(--ease-smooth-out),
+      background-color var(--duration-fast) var(--ease-smooth-out),
+      border-color var(--duration-fast) var(--ease-smooth-out);
+  }
+
+  #nd-sidebar[data-collapsed="true"] > :not(:first-child),
+  #nd-sidebar[data-collapsed="true"] > :first-child > :not(:first-child),
+  #nd-sidebar[data-collapsed="true"] > :first-child > :first-child > button,
+  #nd-sidebar[data-collapsed="true"] .docs-wordmark-text {
+    opacity: 0;
+    transition-delay: 0ms;
+  }
+
+  #nd-docs-layout[data-sidebar-collapsed="true"] [data-sidebar-placeholder] > div {
+    pointer-events: none;
+  }
+
+  /* Under the logo, on the rail */
+  [data-sidebar-panel] {
+    top: calc(var(--fd-docs-row-1, 0px) + 60px);
+    inset-inline-start: 0;
+    z-index: 30;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 56px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transition: opacity var(--duration-fast) var(--ease-smooth-out);
+  }
+
+  /* Comes in as the rail settles, and goes at once as the sidebar opens */
+  #nd-docs-layout[data-sidebar-collapsed="true"] [data-sidebar-panel] {
+    transition-delay: 200ms;
+  }
+
+  [data-sidebar-panel] > button {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  /* The theme's switch at the rail's foot (components/rail-theme.tsx), there only while the sidebar is folded, standing
+     up to fit the rail */
+  .rail-theme {
+    position: fixed;
+    bottom: 16px;
+    left: 0;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-fast) var(--ease-smooth-out);
+  }
+
+  .rail-theme [data-theme-toggle] {
+    flex-direction: column;
+  }
+
+  #nd-docs-layout[data-sidebar-collapsed="true"] .rail-theme {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 200ms;
+  }
+}
+
+@media (max-width: 767px) {
+  .rail-theme {
+    display: none;
+  }
+}
+
+/* A jump to a heading glides there (the contents' links); Next turns it off while it changes page */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Code and callouts sit on cards that rise off the wash a little */
+/* Only a code block standing on its own: one laid flat inside a card (an API example's, the Playground's panels) turns
+   its corners and its shadow off, and the shadow here had put one back, under its bottom edge */
+:is(figure.shiki, .fd-codeblock):not([class*="rounded-none"], [class*="shadow-none"]) {
+  box-shadow: var(--shadow-soft);
 }
 
 .try-curl {
   display: grid;
   justify-items: start;
-  gap: 12px;
+  gap: 16px;
   margin-block: 16px 24px;
 }
 
+/* The ink pill of the site's primary buttons; a press gives under the finger and springs back (components/motion.tsx) */
 .try-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   min-height: 44px;
-  padding: 0 24px;
+  padding: 0 22px;
+  border-radius: 9999px;
   background: var(--color-fd-foreground);
   color: var(--color-fd-background);
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
+  transition: opacity 150ms ease-out;
+}
+
+.try-button:hover:not(:disabled) {
+  opacity: 0.88;
 }
 
 .try-button:disabled {
@@ -99,7 +1149,92 @@ pre {
   cursor: not-allowed;
 }
 
+/* The button's icon for now (run, again, waiting) blurs and grows in as the last one goes (transitions.dev icon
+   swap); the spinner keeps turning while hidden, so it never snaps back as it leaves */
+.try-icon {
+  display: inline-grid;
+}
+
+.try-icon > svg {
+  grid-area: 1 / 1;
+  opacity: 0;
+  filter: blur(2px);
+  scale: 0.25;
+  transition:
+    opacity 250ms ease-in-out,
+    filter 250ms ease-in-out,
+    scale 250ms ease-in-out;
+}
+
+.try-icon[data-icon="play"] > [data-for="play"],
+.try-icon[data-icon="again"] > [data-for="again"],
+.try-icon[data-icon="wait"] > [data-for="wait"] {
+  opacity: 1;
+  filter: blur(0);
+  scale: 1;
+}
+
+.try-spin {
+  animation: try-spin 900ms linear infinite;
+}
+
+@keyframes try-spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* What came back, as it came: a code block of its own, the whole width, each new answer coming in as the tabs' do */
 .try-output {
-  font-size: 20px;
+  display: block;
+  justify-self: stretch;
   overflow-wrap: anywhere;
+}
+
+.try-response {
+  margin: 0;
+}
+
+/* The copy button comes with the first answer and stays through every one after; it comes in as the run button's
+   icons do */
+.try-response > div > div > button {
+  animation: try-copy-in 250ms ease-in-out;
+}
+
+@keyframes try-copy-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    scale: 0.25;
+  }
+}
+
+.try-response .try-text {
+  display: inline-block;
+  animation: tab-pop-in 500ms cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+/* Nothing has come back yet */
+.try-response .try-empty {
+  color: var(--color-fd-muted-foreground);
+  font-style: italic;
+}
+
+/* Plain text has no lines of code to carry the block's own side inset. A sentence wraps to the block's width rather
+   than scrolling off it (Fumadocs sizes a code block's pre to its longest line) */
+.try-response pre {
+  width: auto;
+  padding-inline: 16px;
+  white-space: pre-wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .try-button,
+  .try-icon > svg,
+  .try-response > div > div > button,
+  .try-response .try-text,
+  .try-spin {
+    transition-duration: 0ms;
+    animation: none;
+  }
 }

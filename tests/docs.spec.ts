@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { expect, type Page, test } from "@playwright/test";
 
 const API = "https://api.shuoshuotw.xyz";
-const CORE = "http://localhost:3001";
+const CORE = "http://localhost:5001";
 const SUPABASE = "http://127.0.0.1:54321";
 
 function secretKey() {
@@ -133,7 +133,7 @@ test.describe("E2E-09: the docs match the API", () => {
   });
 
   test("UI-12: the docs say 說說, never 語錄", async ({ page }) => {
-    for (const path of ["/", "/quickstart", "/security", "/errors", "/migrate-from-hitokoto"]) {
+    for (const path of ["/", "/quickstart", "/security", "/errors", "/migrate-from-hitokoto", "/terms"]) {
       await page.goto(path);
       expect(await page.locator("body").innerText(), path).not.toContain("語錄");
     }

@@ -9,6 +9,7 @@
     "security",
     "migrate-from-hitokoto",
     "changelog",
+    "terms",
     "---共用規範---",
     "concepts/response-format",
     "concepts/pagination",
